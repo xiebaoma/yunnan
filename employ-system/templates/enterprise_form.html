@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h2>企业就业失业数据填报</h2>
+    <form method="post" class="form-grid two-col">
+        <label>企业名称</label>
+        <input type="text" name="enterprise_name" required>
+
+        <label>所属地区</label>
+        <select name="region" required>
+            <option value="昆明">昆明</option>
+            <option value="曲靖">曲靖</option>
+            <option value="玉溪">玉溪</option>
+            <option value="昭通">昭通</option>
+            <option value="大理">大理</option>
+        </select>
+
+        <label>填报周期</label>
+        <select name="report_type" required>
+            <option value="周报">周报</option>
+            <option value="月报">月报</option>
+        </select>
+
+        <label>在职人数</label>
+        <input type="number" name="employee_count" min="0" required>
+
+        <label>新增就业人数</label>
+        <input type="number" name="new_employment" min="0" required>
+
+        <label>离职人数</label>
+        <input type="number" name="resignation_count" min="0" required>
+
+        <label>招聘需求人数</label>
+        <input type="number" name="recruitment_need" min="0" required>
+
+        <label>备注</label>
+        <textarea name="remark" rows="3" placeholder="可选"></textarea>
+
+        <button type="submit">提交填报</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>我的提交记录</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>企业名称</th>
+            <th>地区</th>
+            <th>周期</th>
+            <th>状态</th>
+            <th>提交时间</th>
+        </tr>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.enterprise_name }}</td>
+            <td>{{ r.region }}</td>
+            <td>{{ r.report_type }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ r.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">暂无提交记录</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

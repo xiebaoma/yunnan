@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h2>Agent辅助分析（规则模拟）</h2>
+    <form method="post" class="form-grid">
+        <label>选择一条填报记录</label>
+        <select name="record_id" required>
+            <option value="">请选择</option>
+            {% for r in records %}
+            <option value="{{ r.id }}" {% if selected_record and selected_record.id == r.id %}selected{% endif %}>
+                ID{{ r.id }} - {{ r.enterprise_name }}（{{ r.created_at }}）
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit">生成分析</button>
+    </form>
+</div>
+
+{% if selected_record %}
+<div class="card">
+    <h3>分析对象</h3>
+    <p><b>企业：</b>{{ selected_record.enterprise_name }}</p>
+    <p><b>在职：</b>{{ selected_record.employee_count }}，<b>新增：</b>{{ selected_record.new_employment }}，<b>离职：</b>{{ selected_record.resignation_count }}，<b>招聘需求：</b>{{ selected_record.recruitment_need }}</p>
+</div>
+
+<div class="card">
+    <h3>Agent分析结果</h3>
+    <p>{{ analysis_text }}</p>
+    <p><b>审核建议：</b>{{ suggestion_text }}</p>
+</div>
+{% endif %}
+{% endblock %}

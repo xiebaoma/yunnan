@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card login-card">
+    <h2>系统登录</h2>
+    <form method="post" class="form-grid">
+        <label>用户名</label>
+        <input type="text" name="username" required>
+
+        <label>密码</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">登录</button>
+    </form>
+    <div class="hint">
+        <p>测试账号：</p>
+        <p>企业用户：enterprise1 / 123456</p>
+        <p>审核员：reviewer1 / 123456</p>
+        <p>管理员：admin1 / 123456</p>
+    </div>
+</div>
+{% endblock %}

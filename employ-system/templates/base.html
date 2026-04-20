@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or '云南省企业就业失业数据采集系统' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1>云南省企业就业失业数据采集系统（演示版）</h1>
+        {% if session_user.username %}
+        <div class="user-info">
+            <span>当前用户：{{ session_user.username }}（{{ session_user.role }}）</span>
+            <a href="{{ url_for('logout') }}">退出登录</a>
+        </div>
+        {% endif %}
+    </header>
+
+    {% if session_user.username %}
+    <nav class="nav">
+        {% if session_user.role == 'enterprise' %}
+            <a href="{{ url_for('enterprise_report') }}">企业填报</a>
+        {% endif %}
+        {% if session_user.role in ['reviewer', 'admin'] %}
+            <a href="{{ url_for('review_list') }}">审核列表</a>
+            <a href="{{ url_for('stats') }}">统计页</a>
+            <a href="{{ url_for('agent') }}">Agent分析</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-box">
+                    {% for msg in messages %}
+                        <p>{{ msg }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

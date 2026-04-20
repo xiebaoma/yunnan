@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h2>审核详情（记录ID：{{ record.id }}）</h2>
+    <p><b>企业名称：</b>{{ record.enterprise_name }}</p>
+    <p><b>所属地区：</b>{{ record.region }}</p>
+    <p><b>填报周期：</b>{{ record.report_type }}</p>
+    <p><b>在职人数：</b>{{ record.employee_count }}</p>
+    <p><b>新增就业：</b>{{ record.new_employment }}</p>
+    <p><b>离职人数：</b>{{ record.resignation_count }}</p>
+    <p><b>招聘需求：</b>{{ record.recruitment_need }}</p>
+    <p><b>备注：</b>{{ record.remark or '无' }}</p>
+    <p><b>当前状态：</b>{{ record.status }}</p>
+    <p><b>审核意见：</b>{{ record.review_comment or '暂无' }}</p>
+</div>
+
+<div class="card">
+    <h3>Agent辅助提示（规则模拟）</h3>
+    <p>{{ analysis_text }}</p>
+    <p><b>建议：</b>{{ suggestion_text }}</p>
+</div>
+
+<div class="card">
+    <h3>执行审核</h3>
+    <form method="post" class="form-grid">
+        <label>审核意见</label>
+        <textarea name="review_comment" rows="3" placeholder="填写意见（可选）"></textarea>
+
+        <div class="button-row">
+            <button type="submit" name="action" value="approve">通过</button>
+            <button type="submit" name="action" value="reject" class="danger">退回</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

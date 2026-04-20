@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h2>审核列表</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>企业</th>
+            <th>地区</th>
+            <th>周期</th>
+            <th>在职</th>
+            <th>新增</th>
+            <th>离职</th>
+            <th>招聘需求</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.enterprise_name }}</td>
+            <td>{{ r.region }}</td>
+            <td>{{ r.report_type }}</td>
+            <td>{{ r.employee_count }}</td>
+            <td>{{ r.new_employment }}</td>
+            <td>{{ r.resignation_count }}</td>
+            <td>{{ r.recruitment_need }}</td>
+            <td>{{ r.status }}</td>
+            <td><a href="{{ url_for('review_detail', record_id=r.id) }}">查看/审核</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10">暂无数据</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
