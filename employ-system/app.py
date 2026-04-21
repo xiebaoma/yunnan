@@ -276,12 +276,72 @@ def stats():
     pending = db.execute(
         "SELECT COUNT(*) AS c FROM employment_records WHERE status = '待审核'"
     ).fetchone()["c"]
+    rejected = db.execute(
+        "SELECT COUNT(*) AS c FROM employment_records WHERE status = '已退回'"
+    ).fetchone()["c"]
+
+    totals = db.execute(
+        """
+        SELECT
+            COALESCE(SUM(employee_count), 0) AS employee_total,
+            COALESCE(SUM(new_employment), 0) AS new_total,
+            COALESCE(SUM(resignation_count), 0) AS resignation_total,
+            COALESCE(SUM(recruitment_need), 0) AS recruitment_total
+        FROM employment_records
+        """
+    ).fetchone()
+
+    employee_total = totals["employee_total"]
+    new_total = totals["new_total"]
+    resignation_total = totals["resignation_total"]
+    recruitment_total = totals["recruitment_total"]
+    net_growth = new_total - resignation_total
+    approval_rate = (approved / total * 100) if total else 0
+    resignation_rate = (resignation_total / employee_total * 100) if employee_total else 0
+
+    high_risk_count = db.execute(
+        """
+        SELECT COUNT(*) AS c
+        FROM employment_records
+        WHERE (employee_count > 0 AND resignation_count > employee_count * 0.5)
+           OR recruitment_need > MAX(20, employee_count * 0.8)
+        """
+    ).fetchone()["c"]
 
     region_stats = db.execute(
-        "SELECT region, COUNT(*) AS c FROM employment_records GROUP BY region ORDER BY c DESC"
+        """
+        SELECT
+            region,
+            COUNT(*) AS record_count,
+            COALESCE(SUM(employee_count), 0) AS employee_total,
+            COALESCE(SUM(new_employment), 0) AS new_total,
+            COALESCE(SUM(resignation_count), 0) AS resignation_total,
+            COALESCE(SUM(recruitment_need), 0) AS recruitment_total
+        FROM employment_records
+        GROUP BY region
+        ORDER BY record_count DESC
+        """
     ).fetchall()
     report_type_stats = db.execute(
-        "SELECT report_type, COUNT(*) AS c FROM employment_records GROUP BY report_type ORDER BY c DESC"
+        """
+        SELECT
+            report_type,
+            COUNT(*) AS record_count,
+            COALESCE(SUM(new_employment), 0) AS new_total,
+            COALESCE(SUM(resignation_count), 0) AS resignation_total
+        FROM employment_records
+        GROUP BY report_type
+        ORDER BY record_count DESC
+        """
+    ).fetchall()
+
+    latest_records = db.execute(
+        """
+        SELECT id, enterprise_name, region, new_employment, resignation_count, status, created_at
+        FROM employment_records
+        ORDER BY id DESC
+        LIMIT 5
+        """
     ).fetchall()
 
     return render_template(
@@ -289,8 +349,18 @@ def stats():
         total=total,
         approved=approved,
         pending=pending,
+        rejected=rejected,
+        employee_total=employee_total,
+        new_total=new_total,
+        resignation_total=resignation_total,
+        recruitment_total=recruitment_total,
+        net_growth=net_growth,
+        approval_rate=approval_rate,
+        resignation_rate=resignation_rate,
+        high_risk_count=high_risk_count,
         region_stats=region_stats,
         report_type_stats=report_type_stats,
+        latest_records=latest_records,
     )
 
 

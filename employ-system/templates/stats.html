@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h2>统计总览</h2>
+    <h2>就业关键指标看板</h2>
     <div class="stats-grid">
         <div class="stat-item">
             <p>数据总数</p>
@@ -15,17 +15,69 @@
             <p>待审核数量</p>
             <h3>{{ pending }}</h3>
         </div>
+        <div class="stat-item">
+            <p>已退回数量</p>
+            <h3>{{ rejected }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>在职人数总量</p>
+            <h3>{{ employee_total }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>新增就业总量</p>
+            <h3>{{ new_total }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>离职总量</p>
+            <h3>{{ resignation_total }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>净增就业（新增-离职）</p>
+            <h3>{{ net_growth }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>招聘需求总量</p>
+            <h3>{{ recruitment_total }}</h3>
+        </div>
+        <div class="stat-item">
+            <p>整体离职率</p>
+            <h3>{{ '%.2f'|format(resignation_rate) }}%</h3>
+        </div>
+        <div class="stat-item">
+            <p>审核通过率</p>
+            <h3>{{ '%.2f'|format(approval_rate) }}%</h3>
+        </div>
+        <div class="stat-item warn">
+            <p>高风险记录数</p>
+            <h3>{{ high_risk_count }}</h3>
+        </div>
     </div>
 </div>
 
 <div class="card">
-    <h3>按地区统计</h3>
+    <h3>按地区就业统计（关键信息）</h3>
     <table>
-        <tr><th>地区</th><th>数量</th></tr>
+        <tr>
+            <th>地区</th>
+            <th>记录数</th>
+            <th>在职总量</th>
+            <th>新增就业</th>
+            <th>离职人数</th>
+            <th>净增就业</th>
+            <th>招聘需求</th>
+        </tr>
         {% for r in region_stats %}
-        <tr><td>{{ r.region }}</td><td>{{ r.c }}</td></tr>
+        <tr>
+            <td>{{ r.region }}</td>
+            <td>{{ r.record_count }}</td>
+            <td>{{ r.employee_total }}</td>
+            <td>{{ r.new_total }}</td>
+            <td>{{ r.resignation_total }}</td>
+            <td>{{ r.new_total - r.resignation_total }}</td>
+            <td>{{ r.recruitment_total }}</td>
+        </tr>
         {% else %}
-        <tr><td colspan="2">暂无数据</td></tr>
+        <tr><td colspan="7">暂无数据</td></tr>
         {% endfor %}
     </table>
 </div>
@@ -33,11 +85,51 @@
 <div class="card">
     <h3>按填报周期统计</h3>
     <table>
-        <tr><th>填报周期</th><th>数量</th></tr>
+        <tr>
+            <th>填报周期</th>
+            <th>记录数</th>
+            <th>新增就业</th>
+            <th>离职人数</th>
+            <th>净增就业</th>
+        </tr>
         {% for r in report_type_stats %}
-        <tr><td>{{ r.report_type }}</td><td>{{ r.c }}</td></tr>
+        <tr>
+            <td>{{ r.report_type }}</td>
+            <td>{{ r.record_count }}</td>
+            <td>{{ r.new_total }}</td>
+            <td>{{ r.resignation_total }}</td>
+            <td>{{ r.new_total - r.resignation_total }}</td>
+        </tr>
         {% else %}
-        <tr><td colspan="2">暂无数据</td></tr>
+        <tr><td colspan="5">暂无数据</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h3>最近上报记录（用于快速观察就业变化）</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>企业</th>
+            <th>地区</th>
+            <th>新增就业</th>
+            <th>离职人数</th>
+            <th>状态</th>
+            <th>提交时间</th>
+        </tr>
+        {% for r in latest_records %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.enterprise_name }}</td>
+            <td>{{ r.region }}</td>
+            <td>{{ r.new_employment }}</td>
+            <td>{{ r.resignation_count }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ r.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">暂无数据</td></tr>
         {% endfor %}
     </table>
 </div>
