@@ -107,6 +107,49 @@
 </div>
 
 <div class="card">
+    <h3>就业趋势（最近14天）</h3>
+    <table class="trend-table">
+        <tr>
+            <th>日期</th>
+            <th>上报数</th>
+            <th>新增就业</th>
+            <th>离职人数</th>
+            <th>净增就业</th>
+            <th>招聘需求</th>
+        </tr>
+        {% for t in trend_data %}
+        <tr>
+            <td>{{ t.report_date }}</td>
+            <td>{{ t.record_count }}</td>
+            <td>
+                <div class="bar-cell">
+                    <span class="bar new" style="width: {{ t.new_pct }}%"></span>
+                    <span class="bar-label">{{ t.new_total }}</span>
+                </div>
+            </td>
+            <td>
+                <div class="bar-cell">
+                    <span class="bar leave" style="width: {{ t.resignation_pct }}%"></span>
+                    <span class="bar-label">{{ t.resignation_total }}</span>
+                </div>
+            </td>
+            <td class="{% if t.net_total < 0 %}negative{% endif %}">
+                {{ t.net_total }}
+            </td>
+            <td>
+                <div class="bar-cell">
+                    <span class="bar recruit" style="width: {{ t.recruitment_pct }}%"></span>
+                    <span class="bar-label">{{ t.recruitment_total }}</span>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">暂无趋势数据</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
     <h3>最近上报记录（用于快速观察就业变化）</h3>
     <table>
         <tr>

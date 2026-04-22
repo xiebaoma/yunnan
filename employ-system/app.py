@@ -344,6 +344,64 @@ def stats():
         """
     ).fetchall()
 
+    trend_rows = db.execute(
+        """
+        SELECT
+            DATE(created_at) AS report_date,
+            COUNT(*) AS record_count,
+            COALESCE(SUM(new_employment), 0) AS new_total,
+            COALESCE(SUM(resignation_count), 0) AS resignation_total,
+            COALESCE(SUM(recruitment_need), 0) AS recruitment_total
+        FROM employment_records
+        WHERE DATE(created_at) >= DATE('now', '-13 day')
+        GROUP BY DATE(created_at)
+        ORDER BY report_date
+        """
+    ).fetchall()
+
+    # 没有近14天数据时，回退展示全部日期趋势
+    if not trend_rows:
+        trend_rows = db.execute(
+            """
+            SELECT
+                DATE(created_at) AS report_date,
+                COUNT(*) AS record_count,
+                COALESCE(SUM(new_employment), 0) AS new_total,
+                COALESCE(SUM(resignation_count), 0) AS resignation_total,
+                COALESCE(SUM(recruitment_need), 0) AS recruitment_total
+            FROM employment_records
+            GROUP BY DATE(created_at)
+            ORDER BY report_date
+            """
+        ).fetchall()
+
+    max_trend_value = 1
+    trend_data = []
+    for row in trend_rows:
+        net_total = row["new_total"] - row["resignation_total"]
+        max_trend_value = max(
+            max_trend_value,
+            row["new_total"],
+            row["resignation_total"],
+            row["recruitment_total"],
+            abs(net_total),
+        )
+        trend_data.append(
+            {
+                "report_date": row["report_date"],
+                "record_count": row["record_count"],
+                "new_total": row["new_total"],
+                "resignation_total": row["resignation_total"],
+                "recruitment_total": row["recruitment_total"],
+                "net_total": net_total,
+            }
+        )
+
+    for item in trend_data:
+        item["new_pct"] = int(item["new_total"] * 100 / max_trend_value) if max_trend_value else 0
+        item["resignation_pct"] = int(item["resignation_total"] * 100 / max_trend_value) if max_trend_value else 0
+        item["recruitment_pct"] = int(item["recruitment_total"] * 100 / max_trend_value) if max_trend_value else 0
+
     return render_template(
         "stats.html",
         total=total,
@@ -361,6 +419,7 @@ def stats():
         region_stats=region_stats,
         report_type_stats=report_type_stats,
         latest_records=latest_records,
+        trend_data=trend_data,
     )
 
 
